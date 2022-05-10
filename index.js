@@ -29,7 +29,7 @@ console.log('Home Team Goals:', finals2014[0]['Home Team Goals'])
 console.log('Away Team Goals:', finals2014[0]['Away Team Goals'])
 
 //(e) Winner of 2014 world cup final 
-console.log('Win Condition:', finals2014[0]['Win conditions'],'\n Winner: Unclear with data')
+console.log('Winner:', finals2014[0]['Home Team Name'])
 
 /* 🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 Task 2: 🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 
 Use getFinals to do the following:
@@ -55,7 +55,7 @@ Use the higher-order function called getYears to do the following:
 3. Return an array called years containing all of the years in the getFinals data set*/
 
 function getYears(array, cbFinals) {
-    const years = array.map(function(item){
+    const years = cbFinals(array).map(function(item){
         return item.Year
     })
     return years
@@ -72,10 +72,31 @@ Use the higher-order function getWinners to do the following:
 💡 HINT: Don't worry about ties for now (Please see the README file for info on ties for a stretch goal.)
 4. Returns the names of all winning countries in an array called `winners` */ 
 
-function getWinners(array, cbFinals) {
+// //Without using .map(), .filter(), .forEach()
+// function getWinners(array, cbFinals) {
+//     const winners = []
+//     const finals = cbFinals(array)
+    
+//     for(let i=0; i < finals.length; i++){
+//         if(finals[i]['Home Team Goals'] > finals[i]['Away Team Goals']){
+//             winners.push(finals[i]['Home Team Name'])
+//        } 
+//        else {
+//            winners.push(finals[i]['Away Team Name'])
+//         }
+//    }
+//    return winners
+// }
 
+// console.log('Finals Winner:', getWinners(fifaData, getFinals))
+
+function getWinners(array, cbfinals){
+    const winners = cbfinals(array).map(match => {return match['Home Team Goals'] > match['Away Team Goals'] ? match['Home Team Name'] : match['Away Team Name']
+})
+    return winners
 }
 
+console.log('Finals Winner:', getWinners(fifaData, getFinals))
 
 
 /* 🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 Task 5: 🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 
@@ -86,16 +107,19 @@ Use the higher-order function getWinnersByYear to do the following:
 4. Receive a callback function as the fourth parameter that will take getWinners from task 4 as an argument
 5. Return an array of strings that say "In {year}, {country} won the world cup!" 
 
-💡 HINT: the strings returned need to exactly match the string in step 4.
+💡 HINT: the strings returned need to exactly match the string in step 5.
  */
 
 function getWinnersByYear(array, cbFinals, cbYears, cbWinners) {
-    array.forEach(item => {
-        console.log(`In ${cbYears}, ${cbWinners} wond the world cup!`)
-    })
+    const years = cbYears(array, cbFinals)
+    const winners = cbWinners(array, cbFinals)
+
+    return winners.map((winner, index) => 
+        `In ${years[index]}, ${winner} won the world cup!`
+    )
 }
 
-// console.log(getWinnersByYear(fifaData, getFinals, getYears, getWinners)) - not tested yet b/c cbWinners is not done yet
+console.log('Winners by Year:', getWinnersByYear(fifaData, getFinals, getYears, getWinners))
 
 
 /* 🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 Task 6: 🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀
@@ -112,9 +136,18 @@ Use the higher order function getAverageGoals to do the following:
 */
 
 function getAverageGoals(cbFinals){
+    const allGoals = [cbFinals.reduce((accumulator, goals) => {
+        return accumulator + goals['Home Team Goals'] + goals['Away Team Goals']
+    }, 0)]
+    
+    const avGoals = allGoals.reduce((accumulator, goals) => {
+        return (accumulator * goals)/cbFinals.length;
+    }, 1)
+
+    return avGoals.toFixed(2)
  }
 
-// console.log(getAverageGoals(getFinals(fifaData))
+console.log(getAverageGoals(getFinals(fifaData)))
 
 
 /// 🥅 STRETCH 🥅 ///
@@ -125,7 +158,7 @@ Create a function called `getCountryWins` that takes the parameters `data` and `
 Hint: Investigate your data to find "team initials"!
 Hint: use `.reduce` */
 
-function getCountryWins(data, teamInitials) {
+function getCountryWins(){
 }
 
 
@@ -134,8 +167,6 @@ function getCountryWins(data, teamInitials) {
 Write a function called getGoals() that accepts a parameter `data` and returns the team with the most goals score per appearance (average goals for) in the World Cup finals */
 
 function getGoals(data) {
-
-    /* code here */
 
 }
 
